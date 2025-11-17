@@ -2,114 +2,205 @@ import React from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Particles from './Particles'
 
-// Colors
+// Palette
 const COLORS = {
   rose: '#B06D6C',
   sand: '#9E9182',
-  navy: '#0f1524',
   deep: '#272D3D',
+  navy: '#0f1524',
 }
 
 export default function Hero() {
   const { scrollY } = useScroll()
-  const skyY = useTransform(scrollY, [0, 600], [0, -120])
-  const mountainsY = useTransform(scrollY, [0, 600], [0, -60])
-  const seaY = useTransform(scrollY, [0, 600], [0, -20])
+
+  // Parallax mapping (sky slowest → foreground fastest)
+  const skyY = useTransform(scrollY, [0, 800], [0, -60])
+  const glowY = useTransform(scrollY, [0, 800], [0, -90])
+  const mountainsY = useTransform(scrollY, [0, 800], [0, -30])
+  const waterY = useTransform(scrollY, [0, 800], [0, -10])
+  const moonY = useTransform(scrollY, [0, 800], [0, -120])
+  const womanY = useTransform(scrollY, [0, 800], [0, -160])
 
   return (
-    <section className="relative min-h-[92vh] w-full overflow-hidden" style={{background:`linear-gradient(180deg, rgba(176,109,108,0.35) 0%, rgba(158,145,130,0.22) 18%, rgba(39,45,61,0.65) 70%, ${COLORS.navy} 100%)`}}>
-      {/* Atmospheric glow */}
-      <div className="absolute inset-0" style={{
-        background: `radial-gradient(1000px 500px at 30% 25%, rgba(255,180,160,0.35), transparent 60%),
-                     radial-gradient(900px 500px at 70% 30%, rgba(255,150,190,0.25), transparent 60%)`
-      }} />
-
-      {/* Parallax sky */}
-      <motion.div className="absolute inset-0" style={{ y: skyY }}>
-        <div className="absolute inset-0" style={{
-          background: `linear-gradient(180deg, #F4B6A6 0%, #F0A2B6 20%, #E58FA8 32%, #d27d8e 45%, #9E9182 60%, ${COLORS.deep} 80%, ${COLORS.navy} 100%)`
-        }} />
+    <section className="relative min-h-[100vh] w-full overflow-hidden" aria-label="Cinematic hero">
+      {/* BACKGROUND SKY (slowest) */}
+      <motion.div className="absolute inset-0" style={{ y: skyY }} aria-hidden>
+        {/* Realistic dusk gradient */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(255,186,150,0.95) 0%, rgba(247,160,182,0.92) 18%, rgba(208,125,142,0.85) 34%, rgba(158,145,130,0.58) 56%, rgba(39,45,61,0.78) 78%, #0f1524 100%)',
+          }}
+        />
       </motion.div>
 
-      {/* Parallax mountains (silhouettes) */}
-      <motion.svg style={{ y: mountainsY }} className="absolute bottom-[28vh] left-0 right-0 w-full" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden>
-        <defs>
-          <linearGradient id="mountainGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#2c3347" />
-            <stop offset="100%" stopColor="#171d2b" />
-          </linearGradient>
-        </defs>
-        <path d="M0,200 L120,160 L240,200 L360,140 L480,180 L600,120 L720,180 L840,150 L960,200 L1080,160 L1200,200 L1320,170 L1440,200 L1440,320 L0,320 Z" fill="url(#mountainGrad)" opacity="0.95" />
-        <path d="M0,220 L120,190 L240,220 L360,170 L480,210 L600,160 L720,210 L840,180 L960,220 L1080,190 L1200,220 L1320,200 L1440,220 L1440,320 L0,320 Z" fill="#121828" opacity="0.9" />
+      {/* SUNSET GLOW (soft radial bloom near horizon) */}
+      <motion.div className="absolute inset-0" style={{ y: glowY }} aria-hidden>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(900px 420px at 58% 34%, rgba(255,178,150,0.45), transparent 60%), radial-gradient(700px 360px at 52% 36%, rgba(176,109,108,0.35), transparent 62%)',
+            mixBlendMode: 'screen',
+          }}
+        />
+      </motion.div>
+
+      {/* CRESCENT MOON (gently floating) */}
+      <motion.div
+        className="absolute right-[12%] top-[10%] w-20 h-20 md:w-24 md:h-24"
+        style={{ y: moonY }}
+        aria-hidden
+      >
+        <motion.svg
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 0.9, y: [0, -4, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          viewBox="0 0 100 100"
+          className="w-full h-full"
+        >
+          <defs>
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#F6EDE6" stopOpacity="1" />
+              <stop offset="100%" stopColor="#F6EDE6" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {/* Glow */}
+          <circle cx="50" cy="50" r="40" fill="url(#moonGlow)" opacity="0.45" />
+          {/* Crescent */}
+          <path
+            d="M60,50 A24,24 0 1 1 36,26 A18,24 0 1 0 60,50 Z"
+            fill="#F5F2EA"
+          />
+        </motion.svg>
+      </motion.div>
+
+      {/* ULTRA-LOW MOUNTAINS ON HORIZON (very subtle) */}
+      <motion.svg
+        className="absolute left-0 right-0 w-full"
+        style={{ y: mountainsY, bottom: '36vh' }}
+        viewBox="0 0 1440 120"
+        preserveAspectRatio="none"
+        aria-hidden
+      >
+        <path
+          d="M0,80 L120,74 L260,78 L380,70 L520,76 L660,72 L820,74 L980,70 L1140,76 L1280,72 L1440,78 L1440,120 L0,120 Z"
+          fill="rgba(18,24,40,0.45)"
+        />
       </motion.svg>
 
-      {/* Perfectly flat calm sea */}
-      <motion.div style={{ y: seaY }} className="absolute bottom-0 left-0 right-0 h-[32vh]" aria-hidden>
-        <div className="absolute inset-0" style={{
-          background: `linear-gradient(180deg, rgba(25,32,50,0.9) 0%, rgba(15,21,36,0.98) 60%, ${COLORS.navy} 100%)`
-        }} />
+      {/* PERFECTLY FLAT WATER SURFACE + REFLECTION PLANE */}
+      <motion.div className="absolute left-0 right-0" style={{ y: waterY, bottom: 0, height: '40vh' }} aria-hidden>
+        {/* Water body with subtle vertical gradient and slight specular sheen */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(25,32,50,0.92) 0%, rgba(20,27,44,0.98) 55%, #0f1524 100%)',
+          }}
+        />
         {/* Thin horizon line to emphasize flatness */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-white/20" />
+        <div className="absolute -top-px left-0 right-0 h-[1px] bg-white/35" />
+
+        {/* Soft horizontal highlight on the water as if from sun/moon blend */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 top-2 w-[60%] h-8 md:h-10 opacity-30 blur-md"
+          style={{
+            background:
+              'radial-gradient(60% 100% at 50% 50%, rgba(255,210,190,0.45), transparent 70%)',
+          }}
+        />
       </motion.div>
 
-      {/* Dust particles */}
-      <Particles count={90} />
+      {/* DUST PARTICLES (very subtle for realism) */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <Particles count={50} />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 md:px-12 pt-28 pb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <div>
+      {/* CONTENT GRID */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 md:px-12 pt-28 md:pt-32 pb-16 md:pb-24 grid grid-cols-1 md:grid-cols-2 items-end gap-10">
+        {/* LEFT: Title and subtitle */}
+        <div className="relative">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight"
+            transition={{ duration: 0.9 }}
+            className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-[1.05] tracking-tight"
             style={{ color: '#F0EAE6' }}
           >
             Ноќ без враќање
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.15 }}
-            className="mt-6 text-lg sm:text-xl max-w-xl"
-            style={{ color: 'rgba(240,234,230,0.8)' }}
+            transition={{ duration: 0.9, delay: 0.1 }}
+            className="mt-5 text-xl sm:text-2xl font-medium"
+            style={{ color: 'rgba(240,234,230,0.82)' }}
           >
-            Трилер што те носи на рабовите на тишината — таму каде што морето е мирно, но срцето не е. Откриј тајни што не се враќаат назад.
+            Балканска трилер сензација
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.3 }}
-            className="mt-8 flex gap-4"
-          >
-            <a href="#about" className="px-5 py-3 rounded-md font-semibold text-white shadow-lg shadow-[rgba(176,109,108,0.25)]" style={{ background: COLORS.rose }}>Погледни повеќе</a>
-            <a href="#cta" className="px-5 py-3 rounded-md font-semibold" style={{ color: COLORS.sand, borderColor: COLORS.sand, borderWidth: 1 }}>Нарачај сега</a>
-          </motion.div>
         </div>
 
-        {/* Book cover with soft 3D hover */}
+        {/* RIGHT: Woman standing on reflective sea with realistic reflection */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, delay: 0.2 }}
-          whileHover={{ rotateY: 6, rotateX: -2, y: -6 }}
-          className="relative h-[460px] md:h-[520px] w-full flex items-center justify-center"
-          style={{ transformStyle: 'preserve-3d' }}
+          transition={{ duration: 1.0, delay: 0.15 }}
+          style={{ y: womanY }}
+          className="relative h-[460px] md:h-[520px] w-full flex items-end justify-end"
+          aria-label="Woman standing on water"
         >
-          <div className="relative w-[280px] md:w-[320px] h-[420px] md:h-[480px] rounded-lg overflow-hidden shadow-2xl"
-               style={{ background: `linear-gradient(140deg, ${COLORS.deep}, #0c1221)` }}>
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 20%, rgba(255,200,190,0.12), transparent 40%)' }} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6">
-                <h3 className="text-3xl font-bold" style={{ color: '#F0EAE6' }}>Ноќ без враќање</h3>
-                <p className="mt-3 text-sm" style={{ color: 'rgba(240,234,230,0.75)' }}>Премиум издание</p>
-              </div>
+          {/* Foreground subject (placeholder silhouette blended to feel photographic) */}
+          <div className="relative w-[220px] sm:w-[260px] md:w-[300px] h-[420px] md:h-[480px]">
+            {/* Subject figure */}
+            <div
+              className="absolute bottom-[40%] right-2 sm:right-4 md:right-6 w-[56%] aspect-[3/7]"
+              style={{
+                background:
+                  `linear-gradient(180deg, ${COLORS.deep}, #0b1020)`,
+                boxShadow: '0 30px 60px rgba(0,0,0,0.45)',
+                clipPath: 'polygon(50% 0%, 58% 8%, 62% 16%, 64% 25%, 64% 80%, 60% 90%, 58% 100%, 42% 100%, 40% 90%, 36% 80%, 36% 25%, 38% 16%, 42% 8%)',
+                borderRadius: 6,
+                filter: 'saturate(0.9) contrast(1.05)',
+              }}
+            >
+              {/* Rim light to simulate sunset edge lighting */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(255,180,150,0.0) 0%, rgba(255,190,170,0.35) 88%, rgba(255,210,190,0.6) 100%)',
+                  mixBlendMode: 'screen',
+                }}
+              />
             </div>
-            {/* Edge highlight */}
-            <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)' }} />
+
+            {/* Reflection of the subject on water */}
+            <div
+              className="absolute bottom-0 right-2 sm:right-4 md:right-6 w-[56%] aspect-[3/7] origin-top scale-y-[-1]"
+              style={{
+                background:
+                  `linear-gradient(180deg, ${COLORS.deep}, #0b1020)`,
+                clipPath: 'polygon(50% 0%, 58% 8%, 62% 16%, 64% 25%, 64% 80%, 60% 90%, 58% 100%, 42% 100%, 40% 90%, 36% 80%, 36% 25%, 38% 16%, 42% 8%)',
+                opacity: 0.35,
+                filter: 'blur(1px) saturate(0.85)'
+              }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(255,210,190,0.35) 0%, rgba(255,180,150,0.15) 30%, rgba(255,180,150,0.0) 100%)',
+                  mixBlendMode: 'screen',
+                  maskImage:
+                    'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.0) 100%)',
+                  WebkitMaskImage:
+                    'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.0) 100%)',
+                }}
+              />
+            </div>
           </div>
-          {/* Soft ground shadow */}
-          <div className="absolute -bottom-6 w-[70%] h-10 rounded-full blur-2xl opacity-60" style={{ background: 'radial-gradient(closest-side, rgba(0,0,0,0.6), transparent 70%)' }} />
         </motion.div>
       </div>
     </section>
